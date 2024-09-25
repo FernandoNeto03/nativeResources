@@ -7,6 +7,7 @@ android {
     namespace = "com.example.recursosnativos"
     compileSdk = 34
 
+
     defaultConfig {
         applicationId = "com.example.recursosnativos"
         minSdk = 34
@@ -50,7 +51,7 @@ android {
 }
 
 dependencies {
-
+    val camerax_version = "1.2.2"
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -75,4 +76,12 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
     implementation("androidx.core:core:1.12.0")
+    //camera X version
+    implementation("androidx.camera:camera-core:${camerax_version}")
+    implementation("androidx.camera:camera-camera2:${camerax_version}")
+    implementation("androidx.camera:camera-lifecycle:${camerax_version}")
+    implementation("androidx.camera:camera-video:${camerax_version}")
+
+    implementation("androidx.camera:camera-view:${camerax_version}")
+    implementation("androidx.camera:camera-extensions:${camerax_version}")
 }
