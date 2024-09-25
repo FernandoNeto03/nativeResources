@@ -1,19 +1,18 @@
 package com.example.recursosnativos
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,9 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.recursosnativos.ui.theme.RecursosNativosTheme
 import java.io.File
 import java.text.SimpleDateFormat
@@ -53,7 +53,7 @@ class HomeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeActivity()
+                    HomeActivityScreen()
                 }
             }
         }
@@ -61,7 +61,7 @@ class HomeActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeActivity(
+fun HomeActivityScreen(
     uri: Uri? = null,
     directory: File? = null,
     onSetUri: (Uri) -> Unit = {}
@@ -128,14 +128,30 @@ fun HomeActivity(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-//                navigateToLinearLayout(activity)
-            },
-            modifier = Modifier.fillMaxWidth()
+                val permissionCheckResult =
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                cameraLauncher.launch(uri)
+            } else {
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+            }
         ) {
             Text("Take Photo")
         }
     }
+
+    if (capturedImageUri.path?.isNotEmpty() == true){
+        Image(
+            modifier = Modifier
+                .padding(16.dp, 8.dp),
+            painter = rememberAsyncImagePainter(cameraLauncher),
+            contentDescription = null
+        )
+    }
 }
+
+
 
 
 @SuppressLint("SimpleDateFormat")
