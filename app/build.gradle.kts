@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.play.services.location)
     val camerax_version = "1.2.2"
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

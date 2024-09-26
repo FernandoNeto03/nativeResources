@@ -1,49 +1,48 @@
 package com.example.recursosnativos
 
-import android.content.ContentValues
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
+import android.database.Cursor
 
-class DatabaseHelper(context : Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-    companion object {
-        const val DATABASE_NAME = "images.db"
-        const val DATABASE_VERSION = 1
-        const val TABLE_NAME = "images"
-        const val COLUMN_ID = "id"
-        const val COLUMN_IMAGE = "image"
+
+class DatabaseHelper(context: Context) : android.database.sqlite.SQLiteOpenHelper(context, "formdata.db", null, 1) {
+
+    override fun onCreate(db: android.database.sqlite.SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE FormData (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "name TEXT," +
+                    "email TEXT," +
+                    "comment TEXT," +
+                    "image_path TEXT)"
+        )
     }
 
-    override fun onCreate(db: SQLiteDatabase?) {
-        val createTable = "CREATE TABLE $TABLE_NAME (" +
-                "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "$COLUMN_IMAGE BLOB)"
-        db?.execSQL(createTable)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
+    override fun onUpgrade(db: android.database.sqlite.SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS FormData")
         onCreate(db)
     }
 
-    fun insertImage(imageBytes: ByteArray): Long {
-        val db = writableDatabase
-        val contentValues = ContentValues().apply {
-            put(COLUMN_IMAGE, imageBytes)
-        }
-        return db.insert(TABLE_NAME, null, contentValues)
-    }
-
-    fun getImage(id: Long): ByteArray? {
+    fun getAllFormData(): List<FormData> {
+        val formDataList = mutableListOf<FormData>()
         val db = readableDatabase
-        val cursor = db.query(
-            TABLE_NAME, arrayOf(COLUMN_IMAGE), "$COLUMN_ID=?",
-            arrayOf(id.toString()), null, null, null
-        )
-        cursor?.moveToFirst()
-        val imageBytes = cursor?.getBlob(0)
-        cursor?.close()
-
-        return imageBytes
+        val cursor: Cursor = db.query("FormData", null, null, null, null, null, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val email = cursor.getString(cursor.getColumnIndexOrThrow("email"))
+                val comment = cursor.getString(cursor.getColumnIndexOrThrow("comment"))
+                val imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path"))
+                formDataList.add(FormData(name, email, comment, imagePath))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return formDataList
     }
 }
+
+data class FormData(
+    val name: String,
+    val email: String,
+    val comment: String,
+    val imagePath: String?
+)
